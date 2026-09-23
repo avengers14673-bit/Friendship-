@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>A Little Something</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#050505;
+    color:white;
+}
+
+body{
+    position:relative;
+}
+
+/* BACKGROUND */
+.bg{
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(circle at 50% 40%, #202020 0%, #090909 42%, #020202 100%);
+    z-index:-3;
+}
+
+.glow{
+    position:fixed;
+    width:320px;
+    height:320px;
+    border-radius:50%;
+    background:rgba(255,180,100,.08);
+    filter:blur(80px);
+    top:20%;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:-2;
+}
+
+/* PARTICLES */
+canvas{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:1;
+}
+
+/* SCREENS */
+.screen{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
+    text-align:center;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity 1s ease, visibility 1s ease;
+}
+
+.screen.active{
+    opacity:1;
+    visibility:visible;
+}
+
+/* INTRO */
+.intro-small{
+    font-size:12px;
+    letter-spacing:5px;
+    text-transform:uppercase;
+    color:#999;
+    margin-bottom:20px;
+}
+
+.intro-title{
+    font-size:clamp(34px,9vw,62px);
+    font-weight:300;
+    line-height:1.05;
+    letter-spacing:-2px;
+}
+
+.intro-title span{
+    font-weight:600;
+}
+
+.sub{
+    margin-top:18px;
+    color:#aaa;
+    font-size:14px;
+    letter-spacing:1px;
+}
+
+/* BUTTON */
+.btn{
+    margin-top:40px;
+    padding:15px 27px;
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:40px;
+    background:rgba(255,255,255,.06);
+    color:white;
+    font-size:13px;
+    letter-spacing:2px;
+    cursor:pointer;
+    backdrop-filter:blur(12px);
+    transition:.3s;
+}
+
+.btn:active{
+    transform:scale(.94);
+}
+
+/* PHOTO SCREEN */
+.photo-wrap{
+    width:min(88vw,390px);
+    height:min(70vh,620px);
+    border-radius:22px;
+    overflow:hidden;
+    position:relative;
+    box-shadow:
+      0 25px 80px rgba(0,0,0,.8),
+      0 0 50px rgba(255,180,100,.08);
+    transform:scale(.88);
+    opacity:0;
+    transition:transform 1.5s cubic-bezier(.2,.8,.2,1),
+               opacity 1.2s ease;
+}
+
+.photo-wrap.show{
+    transform:scale(1);
+    opacity:1;
+}
+
+.photo-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transform:scale(1.08);
+    animation:photoZoom 12s ease-in-out infinite alternate;
+}
+
+@keyframes photoZoom{
+    from{transform:scale(1.08);}
+    to{transform:scale(1.16);}
+}
+
+.photo-overlay{
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(to bottom,
+        rgba(0,0,0,.15),
+        transparent 45%,
+        rgba(0,0,0,.72));
+}
+
+.photo-text{
+    position:absolute;
+    bottom:25px;
+    left:20px;
+    right:20px;
+    text-align:left;
+}
+
+.photo-text small{
+    color:#ddd;
+    letter-spacing:3px;
+    font-size:10px;
+    text-transform:uppercase;
+}
+
+.photo-text h2{
+    margin-top:7px;
+    font-size:25px;
+    font-weight:400;
+}
+
+/* MESSAGE */
+.message{
+    max-width:430px;
+}
+
+.message .tiny{
+    color:#888;
+    font-size:11px;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    margin-bottom:25px;
+}
+
+.message h1{
+    font-size:clamp(29px,8vw,48px);
+    font-weight:300;
+    line-height:1.2;
+}
+
+.message h1 strong{
+    font-weight:600;
+}
+
+.message p{
+    margin-top:25px;
+    color:#aaa;
+    line-height:1.8;
+    font-size:14px;
+}
+
+/* FINAL */
+.final-title{
+    font-size:clamp(34px,9vw,58px);
+    font-weight:300;
+}
+
+.final-title span{
+    font-weight:600;
+}
+
+.heart{
+    font-size:25px;
+    margin-top:20px;
+    animation:pulse 1.8s infinite;
+}
+
+@keyframes pulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.18);}
+}
+
+/* MUSIC */
+.music{
+    position:fixed;
+    right:18px;
+    top:18px;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(0,0,0,.35);
+    color:white;
+    z-index:10;
+    display:none;
+}
+
+/* DESKTOP */
+@media(min-width:700px){
+    .photo-wrap{
+        width:360px;
+        height:560px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+<div class="glow"></div>
+
+<canvas id="particles"></canvas>
+
+<audio id="music" loop>
+    <!-- Apna instrumental MP3 yahan add kar sakte ho -->
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<button class="music" id="musicBtn">♫</button>
+
+
+<!-- SCREEN 1 -->
+<section class="screen active" id="screen1">
+
+    <div class="intro-small">
+        A little surprise
+    </div>
+
+    <div class="intro-title">
+        I made<br>
+        <span>something</span><br>
+        for you.
+    </div>
+
+    <div class="sub">
+        It's simple. Just open it.
+    </div>
+
+    <button class="btn" onclick="nextScreen(2)">
+        TAP TO OPEN ✦
+    </button>
+
+</section>
+
+
+<!-- SCREEN 2 -->
+<section class="screen" id="screen2">
+
+    <div class="photo-wrap" id="photo">
+        <img src="friend.jpg" alt="A special memory">
+
+        <div class="photo-overlay"></div>
+
+        <div class="photo-text">
+            <small>one picture • one memory</small>
+            <h2>Pretty good moment.</h2>
+        </div>
+    </div>
+
+    <button class="btn" onclick="nextScreen(3)">
+        CONTINUE →
+    </button>
+
+</section>
+
+
+<!-- SCREEN 3 -->
+<section class="screen" id="screen3">
+
+    <div class="message">
+
+        <div class="tiny">
+            No long paragraph
+        </div>
+
+        <h1>
+            Just wanted to say...
+            <br><br>
+            I'm <strong>glad</strong><br>
+            we're friends.
+        </h1>
+
+        <p>
+            That's it.<br>
+            Nothing complicated.<br>
+            Just something I wanted you to know.
+        </p>
+
+    </div>
+
+    <button class="btn" onclick="nextScreen(4)">
+        ONE LAST THING ✦
+    </button>
+
+</section>
+
+
+<!-- SCREEN 4 -->
+<section class="screen" id="screen4">
+
+    <div class="intro-small">
+        That's all
+    </div>
+
+    <div class="final-title">
+        Hope you<br>
+        <span>liked it.</span>
+    </div>
+
+    <div class="heart">♡</div>
+
+    <button class="btn" onclick="location.reload()">
+        REPLAY ↻
+    </button>
+
+</section>
+
+
+<script>
+
+/* SCREEN CONTROL */
+function nextScreen(number){
+
+    document.querySelectorAll(".screen").forEach(s=>{
+        s.classList.remove("active");
+    });
+
+    const next=document.getElementById("screen"+number);
+    next.classList.add("active");
+
+    if(number===2){
+        setTimeout(()=>{
+            document.getElementById("photo")
+                .classList.add("show");
+        },300);
+    }
+
+    startMusic();
+}
+
+
+/* MUSIC */
+const music=document.getElementById("music");
+const musicBtn=document.getElementById("musicBtn");
+
+function startMusic(){
+
+    music.play().then(()=>{
+        musicBtn.style.display="block";
+    }).catch(()=>{});
+}
+
+musicBtn.onclick=()=>{
+    if(music.paused){
+        music.play();
+        musicBtn.textContent="♫";
+    }else{
+        music.pause();
+        musicBtn.textContent="🔇";
+    }
+};
+
+
+/* PARTICLES */
+const canvas=document.getElementById("particles");
+const ctx=canvas.getContext("2d");
+
+let particles=[];
+
+function resize(){
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+}
+
+window.addEventListener("resize",resize);
+resize();
+
+for(let i=0;i<55;i++){
+
+    particles.push({
+        x:Math.random()*window.innerWidth,
+        y:Math.random()*window.innerHeight,
+        r:Math.random()*1.5+.3,
+        speed:Math.random()*.25+.05,
+        opacity:Math.random()*.5+.15
+    });
+
+}
+
+function animate(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    particles.forEach(p=>{
+
+        p.y-=p.speed;
+
+        if(p.y<0){
+            p.y=canvas.height;
+            p.x=Math.random()*canvas.width;
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,255,255,${p.opacity})`;
+        ctx.fill();
+
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+</script>
+
+</body>
+  </html>
